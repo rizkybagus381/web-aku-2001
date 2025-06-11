@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <!-- Penting untuk responsivitas -->
     <title>Rooms Chat Login</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
@@ -28,13 +28,13 @@
             min-height: 100vh;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 16px; /* Padding adaptif untuk layar kecil */
         }
 
         .container {
             background: #fff;
-            max-width: 420px;
-            width: 100%;
+            max-width: 420px; /* Lebar maksimum yang ideal untuk formulir */
+            width: 100%; /* Memastikan formulir memenuhi lebar layar pada perangkat kecil */
             padding: 32px 24px 48px;
             border-radius: 24px;
             box-shadow: 0 16px 48px rgba(0, 0, 0, 0.07);
@@ -143,7 +143,6 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            /* Hidden by default */
             display: none;
         }
 
@@ -152,8 +151,8 @@
             padding: 30px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 380px;
+            width: 90%; /* Lebar adaptif untuk modal */
+            max-width: 380px; /* Lebar maksimum untuk modal */
             animation: fadeIn 0.3s ease-out;
         }
 
@@ -177,7 +176,7 @@
             cursor: pointer;
             color: #888;
             transition: color 0.2s ease;
-            line-height: 1; /* Adjust line-height for better alignment */
+            line-height: 1;
         }
 
         .close-button:hover {
@@ -198,7 +197,7 @@
         }
 
         .input-group input {
-            width: 100%;
+            width: 100%; /* Input akan mengisi seluruh lebar yang tersedia */
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 10px;
@@ -238,8 +237,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 2000; /* Higher z-index than login modals */
-            display: none; /* Hidden by default */
+            z-index: 2000;
+            display: none;
         }
 
         .message-box-content {
@@ -247,8 +246,8 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-            width: 80%;
-            max-width: 350px;
+            width: 80%; /* Lebar adaptif untuk kotak pesan */
+            max-width: 350px; /* Lebar maksimum untuk kotak pesan */
             text-align: center;
             animation: fadeIn 0.2s ease-out;
         }
@@ -282,14 +281,14 @@
         }
 
         /* Responsive adjustments */
-        @media (max-width: 767px) {
+        @media (max-width: 767px) { /* Penyesuaian untuk layar dengan lebar maksimum 767px (biasanya ponsel) */
             .container {
-                padding: 24px 16px 40px;
+                padding: 24px 16px 40px; /* Mengurangi padding untuk layar kecil */
                 border-radius: 16px;
-                max-width: 100%;
+                max-width: 100%; /* Memastikan container tidak melebihi lebar layar */
             }
             .tagline-line {
-                font-size: 1.5rem;
+                font-size: 1.5rem; /* Mengurangi ukuran font untuk layar kecil */
             }
             header {
                 font-size: 1rem;
@@ -310,7 +309,7 @@
             }
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 768px) { /* Penyesuaian untuk layar dengan lebar minimum 768px (biasanya tablet/desktop) */
             body {
                 background: #f0f0f5;
                 padding: 48px;
@@ -432,7 +431,7 @@
         const loginWithPinBtn = document.getElementById('loginWithPinBtn');
         const accountLoginModal = document.getElementById('accountLoginModal');
         const pinLoginModal = document.getElementById('pinLoginModal');
-        const closeButtons = document.querySelectorAll('.close-button'); // Select all close buttons
+        const closeButtons = document.querySelectorAll('.close-button');
 
         const submitAccountLoginBtn = document.getElementById('submitAccountLogin');
         const submitPinLoginBtn = document.getElementById('submitPinLogin');
@@ -520,10 +519,9 @@
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
                 hideModal(accountLoginModal);
                 showMessageBox('Login Akun berhasil!');
-                // Redirect after a short delay to allow message box to be seen
                 setTimeout(() => {
                     window.location.href = REDIRECT_URL;
-                }, 1000); // Redirect after 1 second
+                }, 1000);
             } else {
                 showMessageBox('Username atau password salah.');
             }
@@ -536,10 +534,9 @@
             if (pin === VALID_PIN) {
                 hideModal(pinLoginModal);
                 showMessageBox('Login PIN berhasil!');
-                // Redirect after a short delay to allow message box to be seen
                 setTimeout(() => {
                     window.location.href = REDIRECT_URL;
-                }, 1000); // Redirect after 1 second
+                }, 1000);
             } else {
                 showMessageBox('PIN salah.');
             }
