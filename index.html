@@ -1,34 +1,549 @@
-<!DOCTYPE HTML>
-<!-- Copyright 2014 The Flutter Authors. All rights reserved.
-Use of this source code is governed by a BSD-style license that can be
-found in the LICENSE file. -->
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Flutter Test Browser Host</title>
-  <style>
-    /* Configure so that the test application takes up the whole screen */
-    body {
-      margin: 0;
-      padding: 0;
-      position: fixed;
-      top: 0px;
-      left: 0px;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rooms Chat Login</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
+        rel="stylesheet"
+    />
+    <link
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet"
+    />
+    <style>
+        /* Reset and base */
+        * {
+            box-sizing: border-box;
+        }
 
-    iframe {
-      border: none;
-      width: 2400px;
-      height: 1800px;
-      position: fixed;
-      top: 0px;
-      left: 0px;
-      overflow: hidden;
-    }
-  </style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #f8f8f8;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .container {
+            background: #fff;
+            max-width: 420px;
+            width: 100%;
+            padding: 32px 24px 48px;
+            border-radius: 24px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.07);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        header {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #111;
+            margin-bottom: 48px;
+            user-select: none;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+            margin-bottom: 48px;
+            min-height: 160px;
+        }
+
+        .tagline-line {
+            font-size: 1.8rem;
+            line-height: 1.3;
+            font-weight: 700;
+            color: #111;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 6px;
+        }
+
+        .tagline-line .light {
+            font-weight: 400;
+            color: #888;
+        }
+
+        /* Emoji placeholders as images for accessibility */
+        .icon-emoji {
+            width: 28px;
+            height: 28px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn {
+            min-height: 44px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            border: none;
+            user-select: none;
+        }
+
+        .btn.apple {
+            background-color: #111;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .btn.apple:hover {
+            background-color: #333;
+        }
+
+        .btn.account {
+            background-color: #eee;
+            color: #444;
+        }
+
+        .btn.account:hover {
+            background-color: #ddd;
+        }
+
+        .btn .material-icons {
+            font-size: 20px;
+        }
+
+        .disclaimer {
+            font-size: 0.65rem;
+            color: #bbb;
+            line-height: 1.2;
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Modal Styles (for login forms) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            /* Hidden by default */
+            display: none;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 380px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s ease;
+            line-height: 1; /* Adjust line-height for better alignment */
+        }
+
+        .close-button:hover {
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #333;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #888;
+            box-shadow: 0 0 0 3px rgba(136, 136, 136, 0.2);
+        }
+
+        .modal-footer {
+            margin-top: 30px;
+        }
+
+        .modal-footer .btn {
+            width: 100%;
+            background-color: #111;
+            color: white;
+        }
+
+        .modal-footer .btn:hover {
+            background-color: #333;
+        }
+
+        /* Message Box Styles */
+        .message-box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000; /* Higher z-index than login modals */
+            display: none; /* Hidden by default */
+        }
+
+        .message-box-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .message-box-content p {
+            margin: 0 0 20px 0;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .message-box-content button {
+            background-color: #111;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+
+        .message-box-content button:hover {
+            background-color: #333;
+        }
+
+        /* Animation for modal appearance */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .container {
+                padding: 24px 16px 40px;
+                border-radius: 16px;
+                max-width: 100%;
+            }
+            .tagline-line {
+                font-size: 1.5rem;
+            }
+            header {
+                font-size: 1rem;
+                margin-bottom: 32px;
+            }
+            .modal-content {
+                padding: 25px;
+                border-radius: 12px;
+            }
+            .modal-header h2 {
+                font-size: 1.3rem;
+            }
+            .message-box-content {
+                padding: 20px;
+            }
+            .message-box-content p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (min-width: 768px) {
+            body {
+                background: #f0f0f5;
+                padding: 48px;
+            }
+            .container {
+                max-width: 420px;
+                padding: 40px 32px 56px;
+                border-radius: 32px;
+                box-shadow: 0 24px 60px rgba(0, 0, 0, 0.07);
+            }
+            .tagline-line {
+                font-size: 2.1rem;
+            }
+            header {
+                font-size: 1.3rem;
+                margin-bottom: 56px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="dark"></div>
-  <script src="host.dart.js"></script>
+    <div class="container" role="main" aria-label="Rooms chat login screen">
+        <header>
+            ADMIN
+        </header>
+        <main>
+            <div class="tagline-line" aria-label="Chat icon and text line 1">
+                <strong>Dashboard</strong>
+                <img
+                    src="https://i.pinimg.com/736x/39/81/52/398152ecbcaa8be60571f040b060f220.jpg"
+                    alt="Person emoji"
+                    class="icon-emoji"
+                    aria-hidden="false"
+                    role="img"
+                />
+                <strong>rooms</strong>
+            </div>
+            <div class="tagline-line" aria-label="Text line 2">
+                <span class="light">with the</span>
+                <strong>most</strong>
+            </div>
+            <div class="tagline-line" aria-label="Text line 3">
+                <strong>secret</strong>
+                <img
+                    src="https://i.pinimg.com/736x/b9/c4/fe/b9c4fec41a58eb54d66f68dd7f03a479.jpg"
+                    alt="Group of people emoji"
+                    class="icon-emoji"
+                    aria-hidden="false"
+                    role="img"
+                />
+            </div>
+        </main>
+        <button id="loginWithAccountBtn" class="btn apple" aria-label="Login with Username and Password">
+            <span class="material-icons" aria-hidden="true"></span>
+            LOGIN
+        </button>
+        <button id="loginWithPinBtn" class="btn account" aria-label="Login with PIN">
+            Login Dengan Pin
+        </button>
+
+        <p class="disclaimer">
+            By continuing you confirm that you agree to our <a href="#" tabindex="-1" style="color:#bbb;text-decoration:underline;cursor:not-allowed;">Terms of Service</a>, <a href="#" tabindex="-1" style="color:#bbb;text-decoration:underline;cursor:not-allowed;">Privacy Policy</a> and good behavior in chat with users (enter to your loved ones more often :))
+        </p>
+    </div>
+
+    <!-- Username/Password Login Modal -->
+    <div id="accountLoginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login Akun</h2>
+                <button class="close-button" data-modal-target="accountLoginModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username Anda" />
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Masukkan password Anda" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="submitAccountLogin" class="btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN Login Modal -->
+    <div id="pinLoginModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login PIN</h2>
+                <button class="close-button" data-modal-target="pinLoginModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="pin">PIN</label>
+                    <input type="password" id="pin" placeholder="Masukkan PIN Anda" maxlength="6" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="submitPinLogin" class="btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="messageBox" class="message-box-overlay">
+        <div class="message-box-content">
+            <p id="messageBoxText"></p>
+            <button id="messageBoxCloseBtn">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the buttons and modals
+        const loginWithAccountBtn = document.getElementById('loginWithAccountBtn');
+        const loginWithPinBtn = document.getElementById('loginWithPinBtn');
+        const accountLoginModal = document.getElementById('accountLoginModal');
+        const pinLoginModal = document.getElementById('pinLoginModal');
+        const closeButtons = document.querySelectorAll('.close-button'); // Select all close buttons
+
+        const submitAccountLoginBtn = document.getElementById('submitAccountLogin');
+        const submitPinLoginBtn = document.getElementById('submitPinLogin');
+
+        // References for the custom message box
+        const messageBox = document.getElementById('messageBox');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+        // --- Configuration for login credentials and redirection URL ---
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = '123';
+        const VALID_PIN = '123';
+        const REDIRECT_URL = 'https://rizkybagus381.github.io/Absen-Update-2025/';
+        // ---------------------------------------------------------------
+
+        // Function to show a modal (login forms)
+        function showModal(modalElement) {
+            modalElement.style.display = 'flex';
+        }
+
+        // Function to hide a modal (login forms)
+        function hideModal(modalElement) {
+            modalElement.style.display = 'none';
+            // Clear input fields when modal is closed
+            const inputs = modalElement.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+        }
+
+        // Function to show the custom message box
+        function showMessageBox(message) {
+            messageBoxText.textContent = message;
+            messageBox.style.display = 'flex';
+        }
+
+        // Function to hide the custom message box
+        function hideMessageBox() {
+            messageBox.style.display = 'none';
+        }
+
+        // Event listener for "LOGIN" button (Account Login)
+        loginWithAccountBtn.addEventListener('click', () => {
+            showModal(accountLoginModal);
+        });
+
+        // Event listener for "Login Dengan Pin" button
+        loginWithPinBtn.addEventListener('click', () => {
+            showModal(pinLoginModal);
+        });
+
+        // Event listeners for all close buttons on login modals
+        closeButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const modalId = event.target.dataset.modalTarget;
+                const modalToClose = document.getElementById(modalId);
+                if (modalToClose) {
+                    hideModal(modalToClose);
+                }
+            });
+        });
+
+        // Event listener for clicking outside the login modal content to close it
+        accountLoginModal.addEventListener('click', (event) => {
+            if (event.target === accountLoginModal) {
+                hideModal(accountLoginModal);
+            }
+        });
+
+        pinLoginModal.addEventListener('click', (event) => {
+            if (event.target === pinLoginModal) {
+                hideModal(pinLoginModal);
+            }
+        });
+
+        // Event listener for the custom message box close button
+        messageBoxCloseBtn.addEventListener('click', () => {
+            hideMessageBox();
+        });
+
+        // Event listener for Account Login Submit button (with validation and redirection)
+        submitAccountLoginBtn.addEventListener('click', () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                hideModal(accountLoginModal);
+                showMessageBox('Login Akun berhasil!');
+                // Redirect after a short delay to allow message box to be seen
+                setTimeout(() => {
+                    window.location.href = REDIRECT_URL;
+                }, 1000); // Redirect after 1 second
+            } else {
+                showMessageBox('Username atau password salah.');
+            }
+        });
+
+        // Event listener for PIN Login Submit button (with validation and redirection)
+        submitPinLoginBtn.addEventListener('click', () => {
+            const pin = document.getElementById('pin').value;
+
+            if (pin === VALID_PIN) {
+                hideModal(pinLoginModal);
+                showMessageBox('Login PIN berhasil!');
+                // Redirect after a short delay to allow message box to be seen
+                setTimeout(() => {
+                    window.location.href = REDIRECT_URL;
+                }, 1000); // Redirect after 1 second
+            } else {
+                showMessageBox('PIN salah.');
+            }
+        });
+    </script>
 </body>
 </html>
